@@ -1,0 +1,26 @@
+
+Conexao:
+    usuario: 'root'
+    host: 'localhost'
+    dataBase: 'root'
+    senha: 'password'
+    porta: '3306'
+    
+    
+Mensagens:
+    argumentos:
+        - ''
+        - ' &3/horas &7ver'
+        - ' &3/horas &7top'
+        - ''
+    argumentosAdm:
+        - ''
+        - ' &3/horas &7ver'
+        - ' &3/horas &7top'
+        - ' &3/horas &7add'
+        - ' &3/horas &7remove'
+        - ' &3/horas &7set'
+        - ' &3/horas &7reset'
+        - ''
+    horasVer: ' &6Tempo Jogado: &f%dias% &6Dias &f%horas% &6Horas &f%minutos% &6Minutos e &f%segundos% &6Segundos'
+        

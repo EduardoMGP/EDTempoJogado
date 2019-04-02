@@ -1,0 +1,6 @@
+main: edtempojogado.EDTempoJogado
+author: EduardoMGP
+version: 1.0
+name: EDTempoJogado
+commands:
+    horas:
