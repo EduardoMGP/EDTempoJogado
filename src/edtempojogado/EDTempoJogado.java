@@ -32,7 +32,7 @@ public class EDTempoJogado extends JavaPlugin{
     
     public String getMessage(String m){
         return plugin.getConfig()
-                .getString("Mensagens.horasVer")
+                .getString(m)
                 .replaceAll("&", "§");
     }
     

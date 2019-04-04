@@ -22,5 +22,5 @@ Mensagens:
         - ' &3/horas &7set'
         - ' &3/horas &7reset'
         - ''
-    horasVer: ' &6Tempo Jogado: &f%dias% &6Dias &f%horas% &6Horas &f%minutos% &6Minutos e &f%segundos% &6Segundos'
+    Horas_Ver: ' &6Tempo Jogado: &f%d% &6Dias &f%h% &6Horas e &f%m% &6Minutos'
         

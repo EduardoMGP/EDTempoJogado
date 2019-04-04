@@ -87,7 +87,7 @@ public class Conexao {
 
     public int visualizarTempoJogado(Player p) {
 
-        try {
+        try { 
 
             Connection conexao = abrirConexao();
 

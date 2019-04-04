@@ -67,7 +67,11 @@ public class Comandos implements CommandExecutor {
                     dias = horas / 24;
                     horas = horas % 24;
                 }
-                p.sendMessage();
+                p.sendMessage(plugin.getMessage("Mensagens.horasVer")
+                        .replaceAll("%d%", dias + "")
+                        .replaceAll("%h%", horas + "")
+                        .replaceAll("%m%", minutos + "")
+                );
             }
         }
 
