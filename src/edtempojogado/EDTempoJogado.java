@@ -22,11 +22,16 @@ public class EDTempoJogado extends JavaPlugin{
         Bukkit.getConsoleSender().sendMessage("[EDTempoJogado] Plugin habilitado com sucesso");
         Bukkit.getConsoleSender().sendMessage("[EDTempoJogado] Versao 1.0");
         getCommand("horas").setExecutor(new Comandos());
+        getCommand("addhoraall").setExecutor(new Comandos());
+        this.saveDefaultConfig();
+        Conexao c = new Conexao();
+        c.criarTabela();
     }
 
     @Override
     public void onDisable() {
         Bukkit.getConsoleSender().sendMessage("[EDTempoJogado] Plugin desabilitado com sucesso");
+        this.saveDefaultConfig();
     }
     
     

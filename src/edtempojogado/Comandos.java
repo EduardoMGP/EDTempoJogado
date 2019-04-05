@@ -24,7 +24,19 @@ public class Comandos implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String arg, String[] args) {
+        
+        if (cmd.getName().equalsIgnoreCase("addhoraall")) {
 
+            if (sender instanceof Player) {
+                sender.sendMessage("§6[EDTempoJogado] §fEste comando pode ser executado apenas pelo console");
+                return true;
+            } 
+            
+            Conexao c = new Conexao();
+            c.addTempoJogadoAll();
+            return true;
+            
+        }
         if (cmd.getName().equalsIgnoreCase("horas")) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage("[EDTempoJogado] Este comando pode ser executado apenas por um jogador");
@@ -33,7 +45,7 @@ public class Comandos implements CommandExecutor {
 
             Player p = (Player) sender;
 
-            if (args[0].length() <= 0) {
+            if (args.length <= 0) {
 
                 if (p.hasPermission("edtempojogado.admin")) {
                     for (String m : plugin.getConfig().getStringList("Mensagens.argumentosAdm")) {
@@ -52,27 +64,69 @@ public class Comandos implements CommandExecutor {
                 }
 
             }
-            
-            
-            if(args[0].equalsIgnoreCase("ver")){
+            if (args[0].equalsIgnoreCase("top")) {
                 Conexao c = new Conexao();
-                int minutos = c.visualizarTempoJogado(p);
+                c.visualizarTopJogado(p);
+            }
+
+            if (args[0].equalsIgnoreCase("ver")) {
+                Conexao c = new Conexao();
+                int minutos = 0;
                 int horas = 0;
                 int dias = 0;
-                if(minutos > 60){
-                    horas = minutos / 60;
-                    minutos = minutos % 60;
+                if (args.length >= 2) {
+                    if (!p.hasPermission("edtempojogado.horas_ver")) {
+                        p.sendMessage(plugin.getMessage("Mensagens.sempermissao"));
+                        return true;
+                    }
+                    try {
+                        minutos = Integer.parseInt(c.visualizarTempoJogado(args[1]));
+                    } catch (Exception e) {
+                        p.sendMessage(plugin.getMessage("Mensagens.usuarioNaoExiste"));
+                        return true;
+                    }
+                    horas = 0;
+                    dias = 0;
+                    if (minutos > 60) {
+                        horas = minutos / 60;
+                        minutos = minutos % 60;
+                    }
+                    if (horas > 24) {
+                        dias = horas / 24;
+                        horas = horas % 24;
+                    }
+                    p.sendMessage(plugin.getMessage("Mensagens.horasVerPlayer")
+                            .replaceAll("%d%", dias + "")
+                            .replaceAll("%h%", horas + "")
+                            .replaceAll("%m%", minutos + "")
+                            .replaceAll("%p%", args[1])
+                    );
+                } else {
+                    try {
+                        minutos = Integer.parseInt(c.visualizarTempoJogado(p.getName()));
+                    } catch (Exception e) {
+                        p.sendMessage(plugin.getMessage("Mensagens.usuarioNaoExiste"));
+                        return true;
+                    }
+                    horas = 0;
+                    dias = 0;
+                    if (minutos > 60) {
+                        horas = minutos / 60;
+                        minutos = minutos % 60;
+                    }
+                    if (horas > 24) {
+                        dias = horas / 24;
+                        horas = horas % 24;
+                    }
+                    p.sendMessage(plugin.getMessage("Mensagens.horasVer")
+                            .replaceAll("%d%", dias + "")
+                            .replaceAll("%h%", horas + "")
+                            .replaceAll("%m%", minutos + "")
+                    );
                 }
-                if(horas > 24) {
-                    dias = horas / 24;
-                    horas = horas % 24;
-                }
-                p.sendMessage(plugin.getMessage("Mensagens.horasVer")
-                        .replaceAll("%d%", dias + "")
-                        .replaceAll("%h%", horas + "")
-                        .replaceAll("%m%", minutos + "")
-                );
+
             }
+
         }
 
         return true;

@@ -35,10 +35,10 @@ public class Conexao {
 
         try {
 
-            Connection conexao = null;
-            conexao = DriverManager.getConnection("jdbc:mysql://" + HOST + ":" + PORTA + "/" + DATABASE, USERNAME, SENHA);
-
+            Connection conexao = DriverManager.getConnection("jdbc:mysql://" + HOST + ":" + PORTA + "/" + DATABASE, USERNAME, SENHA);
+            return conexao;
         } catch (Exception e) {
+            System.out.println("Erro: " + e);
         }
 
         return null;
@@ -50,30 +50,33 @@ public class Conexao {
 
             Connection conexao = abrirConexao();
             PreparedStatement ps = conexao.prepareStatement(
-                    "CREATE TABLE EDTempoJogado ("
+                    "CREATE TABLE IF NOT EXISTS edtempojogado ("
                     + "idUsuario INT NOT NULL PRIMARY KEY AUTO_INCREMENT,"
                     + "usuario VARCHAR(50) NOT NULL,"
                     + "tempoJogado INT DEFAULT 0"
-                    + ");"
+                    + ")"
             );
             ps.execute();
-
-            ps.execute(
-                    "DROP PROCEDURE IF EXISTS `visualizarTempoJogado`;"
+            
+            
+             ps = conexao.prepareStatement(
+                    "DROP PROCEDURE IF EXISTS `addTempoJogadoAll`;"
             );
-
-            ps.execute(
-                    "CREATE PROCEDURE IF NOT EXISTS visualizarTempoJogado(usuario VARCHAR(50))\n"
-                    + "BEGIN "
-                    + "    SELECT COUNT(EDTempoJogado.usuario) INTO @PlayerExists FROM EDTempoJogado WHERE EDTempoJogado.usuario = usuario; "
-                    + " 	IF (@PlayerExists > 0) THEN "
-                    + "		    SELECT tempoJogado FROM EDTempoJogado WHERE EDTempoJogado.usuario = usuario; "
-                    + "		ELSE "
-                    + "		    INSERT INTO EDTempoJogado (usuario, tempoJogado) VALUES (usuario, 0); "
-                    + "		    SELECT 0 AS tempoJogado;\n " 
-                    + "END; "
+            ps.execute();
+            
+            ps = conexao.prepareStatement(
+                    "CREATE PROCEDURE IF NOT EXISTS addTempoJogadoAll(usuario VARCHAR(50))\n "
+                    +   "BEGIN "
+                    +       "SELECT COUNT(edtempojogado.usuario) INTO @PlayerExists FROM edtempojogado WHERE edtempojogado.usuario = usuario; "
+                    +       "IF (@PlayerExists > 0) THEN "
+                    +           "SELECT tempoJogado INTO @tempojogado FROM edtempojogado WHERE edtempojogado.usuario = usuario; "
+                    +           "UPDATE edtempojogado SET tempoJogado = @tempojogado + 1 WHERE edtempojogado.usuario = usuario; "
+                    +       "ELSE "
+                    +           "INSERT INTO edtempojogado (usuario, tempoJogado) VALUES (usuario, 1); "
+                    +       "END IF;\n "
+                    +   "END;"
             );
-
+            ps.execute();
             conexao.close();
         } catch (Exception e) {
 
@@ -85,25 +88,89 @@ public class Conexao {
         }
     }
 
-    public int visualizarTempoJogado(Player p) {
+    public String visualizarTempoJogado(String p) {
 
-        try { 
+        try {
 
             Connection conexao = abrirConexao();
 
-            PreparedStatement ps = conexao.prepareStatement("CALL visualizarTempoJogado(?);");
-            ps.setString(1, p.getName());
+            PreparedStatement ps = conexao.prepareStatement("SELECT tempoJogado FROM edtempojogado WHERE usuario = ?;");
+            ps.setString(1, p);
             ResultSet resultado = ps.executeQuery();
             ArrayList r = new ArrayList();
-            if(resultado.next()){
+            if (resultado.next()) {
                 r.add(resultado.getString("tempoJogado"));
+            } else {
+                conexao.close();
+                return null;
             }
             conexao.close();
-            return Integer.parseInt(r.get(0).toString());
+            return r.get(0).toString();
 
         } catch (Exception e) {
         }
-        return 0;
+        return null;
+    }
+
+    public String visualizarTopJogado(Player p) {
+
+        try {
+
+            Connection conexao = abrirConexao();
+
+            PreparedStatement ps = conexao.prepareStatement("SELECT * from edtempojogado ORDER BY tempoJogado DESC LIMIT 5");
+            ResultSet resultado = ps.executeQuery();
+            p.sendMessage("");
+            p.sendMessage(plugin.getMessage("Mensagens.topOnline"));
+            ArrayList r = new ArrayList();
+            int minutos = 0;
+            int horas = 0;
+            int dias = 0;
+
+            p.sendMessage("");
+            while (resultado.next()) {
+                minutos = resultado.getInt("tempoJogado");
+                if (minutos > 60) {
+                    horas = minutos / 60;
+                    minutos = minutos % 60;
+                }
+                if (horas > 24) {
+                    dias = horas / 24;
+                    horas = horas % 24;
+                }
+
+                p.sendMessage(plugin.getMessage("Mensagens.topOnlinePlayers")
+                        .replaceAll("%p%", resultado.getString("usuario"))
+                        .replaceAll("%d%", dias + "")
+                        .replaceAll("%h%", horas + "")
+                        .replaceAll("%m%", minutos + "")
+                );
+            }
+            p.sendMessage("");
+
+            conexao.close();
+            return r.get(0).toString();
+
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public void addTempoJogadoAll() {
+
+        try {
+
+            Connection conexao = abrirConexao();
+            Player[] p = Bukkit.getServer().getOnlinePlayers();
+            for(int i = 0; i < p.length; i++){
+                PreparedStatement ps = conexao.prepareStatement("CALL addTempoJogadoAll(?)");
+                ps.setString(1, p[i].getName());
+                ps.execute();
+            }
+            conexao.close();
+
+        } catch (Exception e) {
+        }
     }
 
 }
