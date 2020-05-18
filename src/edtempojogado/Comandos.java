@@ -10,6 +10,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author EduardoMGP
@@ -71,58 +73,44 @@ public class Comandos implements CommandExecutor {
 
             if (args[0].equalsIgnoreCase("ver")) {
                 Conexao c = new Conexao();
-                int minutos = 0;
-                int horas = 0;
-                int dias = 0;
                 if (args.length >= 2) {
                     if (!p.hasPermission("edtempojogado.horas_ver")) {
                         p.sendMessage(plugin.getMessage("Mensagens.sempermissao"));
                         return true;
                     }
+
                     try {
-                        minutos = Integer.parseInt(c.visualizarTempoJogado(args[1]));
+
+                        String[] online = c.getTempoJogado(args[1]).split(";");
+                        p.sendMessage(plugin.getMessage("Mensagens.horasVerPlayer")
+                                .replaceAll("%d%", online[2] + "")
+                                .replaceAll("%h%", online[3] + "")
+                                .replaceAll("%m%", online[4] + "")
+                                .replaceAll("%p%", args[1])
+                        );
+
                     } catch (Exception e) {
                         p.sendMessage(plugin.getMessage("Mensagens.usuarioNaoExiste"));
                         return true;
                     }
-                    horas = 0;
-                    dias = 0;
-                    if (minutos > 60) {
-                        horas = minutos / 60;
-                        minutos = minutos % 60;
-                    }
-                    if (horas > 24) {
-                        dias = horas / 24;
-                        horas = horas % 24;
-                    }
-                    p.sendMessage(plugin.getMessage("Mensagens.horasVerPlayer")
-                            .replaceAll("%d%", dias + "")
-                            .replaceAll("%h%", horas + "")
-                            .replaceAll("%m%", minutos + "")
-                            .replaceAll("%p%", args[1])
-                    );
+
                 } else {
+
                     try {
-                        minutos = Integer.parseInt(c.visualizarTempoJogado(p.getName()));
+
+                        String[] online = c.getTempoJogado(p.getName()).split(";");
+                        p.sendMessage(plugin.getMessage("Mensagens.horasVer")
+                                .replaceAll("%d%", online[2] + "")
+                                .replaceAll("%h%", online[3] + "")
+                                .replaceAll("%m%", online[4] + "")
+                        );
+
                     } catch (Exception e) {
                         p.sendMessage(plugin.getMessage("Mensagens.usuarioNaoExiste"));
                         return true;
                     }
-                    horas = 0;
-                    dias = 0;
-                    if (minutos > 60) {
-                        horas = minutos / 60;
-                        minutos = minutos % 60;
-                    }
-                    if (horas > 24) {
-                        dias = horas / 24;
-                        horas = horas % 24;
-                    }
-                    p.sendMessage(plugin.getMessage("Mensagens.horasVer")
-                            .replaceAll("%d%", dias + "")
-                            .replaceAll("%h%", horas + "")
-                            .replaceAll("%m%", minutos + "")
-                    );
+
+
                 }
 
             }

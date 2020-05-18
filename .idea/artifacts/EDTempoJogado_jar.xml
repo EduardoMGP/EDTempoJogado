@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="EDTempoJogado:jar">
+    <output-path>$USER_HOME$/Desktop/server Dev/plugins</output-path>
+    <root id="archive" name="EDTempoJogado.jar">
+      <element id="module-output" name="EDTempoJogado" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>
